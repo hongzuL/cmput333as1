@@ -3,6 +3,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <algorithm>
 
 #define MAX_LEGTH 1000
 using namespace std;
@@ -17,12 +18,34 @@ int map_l = 0;
 int plain_l = 0;
 int key_l = 0;
 
-int size(int arr1[])
-{   
-    int size;
-    size = sizeof(arr1)/sizeof(arr1[0]);
-    return size;
+// check if the elements in this vector already
+int inOrnot(int element, vector<int> arrayv){
+    int flag = 1;
+    if((int)arrayv.size()==0) {return flag;}
+    else {
+        for(int p=0;p<(int)arrayv.size();p++){
+            if(arrayv[p] == element) {
+                flag = 0;
+            }
+        }
+    }
+    return flag;
 }
+// check if the key is satified for the quesiton
+// 0 means yes 1 means no;
+int Key_satis(int dec_num){
+    if (dec_num > 47 & dec_num < 58){
+        return 0;    
+    }
+    if (dec_num > 64 & dec_num < 91){
+        return 0;
+    }
+    if (dec_num >96 & dec_num < 123){
+        return 0;
+    }
+    return 1;
+}
+// Read the Data from the data.txt file 
 void ReadDataWBW()
 {
     ifstream fin("data.txt");
@@ -31,8 +54,8 @@ void ReadDataWBW()
     while (fin >> s) {
         if (s.size() == 2 ){
                 output[i] = s;
-                ciphertext_data[i][0]=output[0];
-                ciphertext_data[i][1]=output[1];
+                ciphertext_data[i][0]=output[i][0];
+                ciphertext_data[i][1]=output[i][1];
                 i++;
         }
     }
@@ -45,16 +68,16 @@ void ReadMap() {
     string m;
     int t = 0;
     int n = 0;
-    long x;
+
     // put all value in to 2d array
     while (fi >> m) {                   // input data to string m
         if(n<16) {
-            map[t][n] = m;
+            map[t][n] = m[2];
             n++;
         }
         else {
             t++;
-            map[t][0] = m;
+            map[t][0] = m[2];
             n=1;    
         }                      
     }
@@ -62,7 +85,7 @@ void ReadMap() {
     // do the printing job, DELETE AFTER THIS PART IS DONE
     for(int r = 0; r<=t; r++) {
         for(int r1=0;r1<16;r1++) {
-        }
+          }
     }
 }
 
@@ -83,65 +106,82 @@ int CheckPrintable(int dec_num) {
 }
 
 void SearchTable(){
-    int* ph = new int[16];
-    int* kl = new int[16];
-    int* pl = new int[16];
-    int* kh = new int[16];
+    //int* ph = new int[16];
+    //int* kl = new int[16];
+    //int* pl = new int[16];
+    //int* kh = new int[16];
+    vector<int> ph;
+    vector<int> kl;
+    vector<int> pl;
+    vector<int> kh;
     vector<int> possiblekey;
     vector<int> possiblekey_tmp;
     vector<int> abosultkey;
-    //a is the ph kl counter
-    //b is the pl kh counter
-    int a = 0;
-    int b = 0;
     //for (int i=0;i<count_number;i+=8){
-    for (int i=0;i<1;i+=8){
+    for (int i=0;i<count_number;i+=8){
         for (int p = 0;  p<16; p++){
-            for (int k = 0;  p<16; k++) {
+            for (int k = 0;  k<16; k++) {
                 if (map[p][k]==ciphertext_data[i][0]){
-                    // here we got the map ph k by ch and save them
-                    ph[a] = p;
-                    kl[a] = k;
-                    a++;
-                   
+                    ph.push_back(p);
+                    kl.push_back(k);
                 }
                 if (map[p][k]==ciphertext_data[i][1]){
-                    pl[b] = p;
-                    kh[b] = k;
-                    b++;
+                    pl.push_back(p);
+                    kh.push_back(k);
                 }
             }
         }
-         cout << possiblekey_tmp[i]<<"Test1 here"<< endl;
-
         //now we get all the combination of ph kl pl kh
         //here we need to check the whether phpl is printable
-        for (int phi=0; phi < size(ph) ; phi++){
-            for (int pli=0; pli < size(pl) ; pli++){
+        //cout << "size(ph)"<< ph.size()<< endl;
+        for (int phi=0; phi < (int)ph.size() ; phi++){
+            for (int pli=0; pli < (int)pl.size() ; pli++){
                 if (CheckPrintable(ph[phi]*16+pl[pli])==1){
-                            possiblekey_tmp.push_back(kh[phi]*16+kl[pli]);                            
+                    int Doc_Num = 0;
+                    Doc_Num = kh[pli]*16+kl[phi];
+                    if (Key_satis(Doc_Num)==0){
+                        if (i>7){
+                            if (inOrnot(Doc_Num,possiblekey)==0 & inOrnot(Doc_Num,possiblekey_tmp)==1){
+                                possiblekey_tmp.push_back(Doc_Num);
+                                cout << "test here" << possiblekey_tmp.size()<<endl;
+                            }
+                        }
+                        else{
+                            if(inOrnot(Doc_Num,possiblekey_tmp)==1){
+                                possiblekey_tmp.push_back(Doc_Num);
+                            }
+                        }
+                    }
                 } 
             }
         }
-        //here is the test for print all the possiblekey_tmp of the first ciphertext
-        for (int i = 0 ; i< possiblekey_tmp.size();i++){
-            cout << possiblekey_tmp[i]<<"Test1 here"<< endl;
+        if ((int)possiblekey.size()==0){
+            possiblekey = possiblekey_tmp;
+            possiblekey_tmp.clear();
+            cout << possiblekey.size() <<endl;
         }
+        else{
+            possiblekey.clear();
+            possiblekey = possiblekey_tmp;
+            possiblekey_tmp.clear();
+        }
+        ph.clear();
+        pl.clear();
+        kl.clear();
+        kh.clear();
+        //here is the test for print all the possiblekey_tmp of the first cipherteit
+       // int size = possiblekey_tmp.size();
     }
-    delete [] ph;
-    delete [] pl;
-    delete [] kl;
-    delete [] kh;
+    for (int counter = 0 ; counter< (int)possiblekey.size();counter++){
+            cout << "PoosibiltK===: "<< findASCII(possiblekey[counter]) << endl;
+    }
+
 }
         //now we get all the possiblekey of the n ciphertext element
 
                     
 int main(){
-    ReadDataWBW();
-    //for(int n=0;n<count_number;n++){
-    //    cout << "higher bit:" << output[n][0] << "\t lower bit" << output[n][1] << endl;
-    //}
-   // delete [] map;
+   ReadDataWBW();  
    ReadMap();
    SearchTable();
    return 0;
