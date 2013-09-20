@@ -71,32 +71,33 @@ int CheckPrintable(int dec_num) {
     else {return 1;}   
 }
 
-// check if similarity of two lists
+// return a 
 void possibleKey(vector<int> arrayA, vector<int> arrayB) {
-    int flag = 1;
     int l=0;
     for(int a=0;a<arrayA.size();a++) {
         for(int b=0;b<arrayB.size();b++){
             if(arrayA[a]==arrayB[b]){
-                if(possible_key.size()==0) {
+                if(inOrout(arrayA[a], possible_key)==1){
                     possible_key[l] = arrayA[a];
                     l++;
-                }
-                else {
-                    for(int p=0;p<possible_key.size();p++){
-                        if(possible_key[p] == arrayA[a]) {
-                            flag = 0;
-                        }
-                    }
-                    if(flag == 1) {
-                        possible_key[l] = arrayA[a];
-                        l++;
-                    }
-
-                }
+                }                
             }
         }    
     }
+}
+
+// check if the elements in this vector already
+int inOrnot(int element, vector<int> arrayv){
+    int flag = 1;
+    if(arrayv.size()==0) {continue;}
+    else {
+        for(int p=0;p<arrayv.size();p++){
+            if(arrayv[p] == element) {
+                flag = 0;
+            }
+        }
+    }
+    return flag;
 }
 
 int main(){
