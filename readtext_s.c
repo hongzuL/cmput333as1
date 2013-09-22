@@ -82,11 +82,6 @@ void ReadMap() {
         }                      
     }
     map_l = t;                          // store length of 2d array
-    // do the printing job, DELETE AFTER THIS PART IS DONE
-    for(int r = 0; r<=t; r++) {
-        for(int r1=0;r1<16;r1++) {
-          }
-    }
 }
 
 void GetplainText(){ 
@@ -102,14 +97,11 @@ char findASCII(int dec_num) {
 // check if the asscii is printable
 int CheckPrintable(int dec_num) {
     if(dec_num >= 0 & dec_num <=31) {return 0;} // check if the decimal number is in [0,31]
+    if(dec_num == 127) {return 0;}
     else {return 1;}   
 }
 
 void SearchTable(){
-    //int* ph = new int[16];
-    //int* kl = new int[16];
-    //int* pl = new int[16];
-    //int* kh = new int[16];
     vector<int> ph;
     vector<int> kl;
     vector<int> pl;
@@ -117,8 +109,7 @@ void SearchTable(){
     vector<int> possiblekey;
     vector<int> possiblekey_tmp;
     vector<int> abosultkey;
-    //for (int i=0;i<count_number;i+=8){
-    for (int i=0;i<count_number;i+=8){
+    for (int i=2;i<count_number;i+=9){
         for (int p = 0;  p<16; p++){
             for (int k = 0;  k<16; k++) {
                 if (map[p][k]==ciphertext_data[i][0]){
@@ -178,7 +169,6 @@ void SearchTable(){
 
 }
         //now we get all the possiblekey of the n ciphertext element
-
                     
 int main(){
    ReadDataWBW();  
